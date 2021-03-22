@@ -19,10 +19,10 @@ function getCase(num) {
     case 9:
       return 'рублей';
     case 1:
-      return 'рубль';  
+      return 'рубль';
     case 2:
-    case 3:  
-    case 4:  
+    case 3:
+    case 4:
       return 'рубля';
   }
 }
@@ -37,7 +37,9 @@ function getDigitBeforeLaste(num) {
   return null;
 }
 
-const money = parseInt(
-  prompt('Какое количество денег, Вы хотите положить в банк?')
-);
-console.log(`Вы положили на счёт ${money} ${getCase(money)}`);
+function task_6() {
+  const money = parseInt(
+    prompt('Какое количество денег, Вы хотите положить в банк?')
+  );
+  console.log(`Вы положили на счёт ${money} ${getCase(money)}`);
+}
