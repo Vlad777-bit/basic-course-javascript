@@ -1,7 +1,5 @@
 'use strict';
 
-'use strict';
-
 const settings = {
   rowsCount: 10,
   colsCount: 10,
@@ -23,7 +21,7 @@ const player = {
    * @param {{x: int, y: int}} nextPoint Следующая точка пользователя.
    */
   move(nextPoint) {
-    this.init(nextPoint.x, nextPoint.y)
+    this.init(nextPoint.x, nextPoint.y);
   },
 
   /**
@@ -150,4 +148,6 @@ const game = {
   },
 };
 
-game.run();
+function task_2() {
+  game.run();
+}
