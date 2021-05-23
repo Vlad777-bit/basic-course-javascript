@@ -1,72 +1,49 @@
 'use strict';
 
 const form = document.querySelector('.my-form');
-const btn = form.querySelector('.btn');
-const input = form.querySelectorAll('input');
-
+const nameEl = document.querySelector('#name');
+const phoneEl = document.querySelector('#phone');
+const passEl = document.querySelector('#password');
+const passRepeatEl = document.querySelector('#password_repeat');
 
 form.addEventListener('submit', event => {
-  for (let i = 0; i < input.length; i++) {
-    if (input[i].id == 'name' && !validInputName(input[i])) {
-      createErrMess(input[i], 'Error length');
-      createErrInput(input[i]);
-      event.preventDefault();
-    }
-
-    if (input[i].id == 'phone' && !validInputPhone(input[i])) {
-      createErrMess(input[i], 'Error phone');
-      createErrInput(input[i]);
-      event.preventDefault();
-    }
-
-    if (input[i].id == 'password' && !validInputPasswd(input[i])) {
-      createErrMess(input[i], 'Error password');
-      createErrInput(input[i]);
-      event.preventDefault();
-    }
-
-    if (input[i].id == 'password_repeat' && !validInputPasswdRepeat(validInputPasswd(input[i]), input[i])) {
-      createErrMess(input[i], 'Error password');
-      createErrInput(input[i]);
-      event.preventDefault();
-    }
-  }
-})
-
-function createErrMess(elem, text) {
-  return elem.insertAdjacentHTML('afterend', `<div class="invalid-feedback flex">${text}</div>`);
-}
-
-function createErrInput(elem) {
-  return elem.style.border = '2px solid red';
-}
-
-function validInputName(input) {
-  if (input.value.length > 1 && input.value.length < 50) {
-    return true;
-  }
-  return;
-}
-
-function validInputPhone(input) {
+  const regExpName = /^[a-zA-Zа-яА-Я]{1,50}$/g;
   const regExpPhone = /^\+7\d{10}/g;
-  
-  if (regExpPhone.test(input.value)) {
-    return true;
-  }
-  return;
-}
+  const regExpPasswd = /^\d|\w{5,50}/g;
 
-function validInputPasswd(input) {
-  if (input.value.length > 5 && input.value.length < 50) {
-    return input.value;
+  if (!regExpName.test(nameEl.value)) {
+    nameEl.classList.add('error');
+    document.querySelector('.name').style.display = 'flex';
+    event.preventDefault();
+  } else {
+    nameEl.classList.remove('error');
+    document.querySelector('.name').style.display = 'none';
   }
-  return;
-}
 
-function validInputPasswdRepeat(fn, input) {
-  if (fn === input.value) {
-    return true;
+  if (!regExpPhone.test(phoneEl.value)) {
+    phoneEl.classList.add('error');
+    document.querySelector('.phone').style.display = 'flex';
+    event.preventDefault();
+  } else {
+    phoneEl.classList.remove('error');
+    document.querySelector('.phone').style.display = 'none';
   }
-  return;
-}
+
+  if (!regExpPasswd.test(passEl.value)) {
+    passEl.classList.add('error');
+    document.querySelector('.passwd').style.display = 'flex';
+    event.preventDefault();
+  } else {
+    passEl.classList.remove('error');
+    document.querySelector('.passwd').style.display = 'none';
+  }
+
+  if (passEl.value != passRepeatEl.value) {
+    passRepeatEl.classList.add('error');
+    document.querySelector('.passwd_rep').style.display = 'flex';
+    event.preventDefault();
+  } else {
+    passRepeatEl.classList.remove('error');
+    document.querySelector('.passwd_rep').style.display = 'none';
+  }
+});

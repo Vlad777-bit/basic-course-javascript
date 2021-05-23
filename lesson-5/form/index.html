@@ -15,11 +15,7 @@ Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="a
     }
 
     .error {
-      border: 1px solid red;
-    }
-
-    .invalid-feedback {
-      display: flex;
+      border: 2px solid red;
     }
   </style>
 </head>
@@ -30,17 +26,21 @@ Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="a
       <div class="form-row">
         <div class="form-group col-md-6">
           <input type="text" id="name" class="form-control" placeholder="Имя">
+          <div class="invalid-feedback name">Имя должно состоять из букв</div>
         </div>
         <div class="form-group col-md-6">
-          <input type="text" id="phone" class="form-control" placeholder="Телефон">
+          <input type="text" id="phone" class="form-control" placeholder="+79999999999">
+          <div class="invalid-feedback phone">Не верный формат номера</div>
         </div>
       </div>
       <div class="form-row">
         <div class="form-group col-md-6">
           <input type="password" id="password" class="form-control" placeholder="Пароль">
+          <div class="invalid-feedback passwd">Введите пароль</div>
         </div>
         <div class="form-group col-md-6">
           <input type="password" id="password_repeat" class="form-control" placeholder="Повторите пароль">
+          <div class="invalid-feedback passwd_rep">Пароли не совпадают</div>
         </div>
       </div>
       <button type="submit" class="btn btn-primary">Отправить</button>
