@@ -17,7 +17,7 @@ const gallery = {
     openedImageScreenClass: 'galleryWrapper__screen',
     openedImageCloseBtnClass: 'galleryWrapper__close',
     openedImageCloseBtnSrc: 'images/gallery/close.png',
-    openedImageErrorSrc: 'images/gallery/err/error.jpg',
+    openedImageErrorSrc: 'images/err/error.webp',
   },
 
   /**
@@ -99,8 +99,9 @@ const gallery = {
     // Создаем картинку, которую хотим открыть, ставим класс и добавляем ее в контейнер-обертку.
     const image = new Image();
     image.onerror = () => {
-      image.src = this.settings.openedImageErrorSrc
+      image.src = this.settings.openedImageErrorSrc;
     }
+
     image.classList.add(this.settings.openedImageClass);
     galleryWrapperElement.appendChild(image);
 
