@@ -355,6 +355,48 @@ const status = {
   },
 };
 
+/** 
+ * Объект счетчика. Подсчитывает очки пользователя. 
+ * @property {int} count Очки пользователя. 
+ * @property {HTMLElement} countEl DOM-элемент для вставки числа отображающего 
+ * количество очков пользователя. 
+ */
+const score = {
+  count: null,
+  countEl: null,
+
+  /**   
+   * Инициализацирует счетчик.   
+   */
+  init() {
+    this.countEl = document.getElementById('count');
+    this.drop();
+  },
+
+  /**   
+   * Инкриминирует счетчик.   
+   */
+  increment() {
+    this.count++;
+    this.render();
+  },
+
+  /**   
+   * Сбрасывает счетчик.   
+   */
+  drop() {
+    this.count = 0;
+    this.render();
+  },
+
+  /**   
+   * Отображает количество очков пользователю.   
+   */
+  render() {
+    this.countEl.innerText = `Счёт: ${this.count}`;
+  },
+}
+
 /**
  * Объект игры.
  * @property {settings} settings Настройки игры.
@@ -363,6 +405,7 @@ const status = {
  * @property {food} food Объект еды.
  * @property {status} status Статус игры.
  * @property {int} tickInterval Номер интервала игры.
+ * @property {score} score Объект счёта
  */
 const game = {
   config,
@@ -371,6 +414,7 @@ const game = {
   food,
   status,
   tickInterval: null,
+  score,
 
   /**
    * Инициализация игры.
@@ -388,6 +432,8 @@ const game = {
       }
       return;
     }
+    // Инициализируем счётчик.
+    this.score.init();
     // Инициализируем карту.
     this.map.init(this.config.getRowsCount(), this.config.getColsCount());
     // Устанавливаем обработчики событий.
@@ -406,6 +452,8 @@ const game = {
     this.snake.init(this.getStartSnakeBody(), 'up');
     // Ставим еду на карту в случайную пустую ячейку.
     this.food.setCoordinates(this.getRandomFreeCoordinates());
+    // Сбрасываем счётчик в ноль.
+    this.score.drop();
     // Отображаем все что нужно для игры.
     this.render();
   },
@@ -456,6 +504,8 @@ const game = {
     }
     // Если следующий шаг будет на еду, то заходим в if.
     if (this.food.isOnPoint(this.snake.getNextStepHeadPoint())) {
+      // Увеличиваем счёт на единицу. 
+      this.score.increment();
       // Прибавляем к змейке ячейку.
       this.snake.growUp();
       // Ставим еду в свободную ячейку.
