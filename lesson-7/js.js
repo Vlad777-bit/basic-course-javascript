@@ -174,21 +174,29 @@ const map = {
  * @property {{x: int, y: int}[]} body Массив с точками тела змейки.
  * @property {string} direction Направление, куда пользователь направил змейку.
  * @property {string} lastStepDirection Направление, куда сходила змейка прошлый раз.
+ * @property {int} maxX Максимальная позиция змейки на карте по оси X.
+ * @property {int} maxY Максимальная позиция змейки на карте по оси Y.
  */
 const snake = {
   body: null,
   direction: null,
   lastStepDirection: null,
+  maxX: null,
+  maxY: null,
 
   /**
    * Инициализирует змейку, откуда она будет начинать и ее направление.
    * @param {{x: int, y: int}[]} startBody Начальная позиция змейки.
    * @param {string} direction Начальное направление игрока.
+   * @param {int} maxX Максимальная позиция змейки по оси X.
+   * @param {int} maxY Максимальная позиция змейки по оси Y.
    */
-  init(startBody, direction) {
+  init(startBody, direction, maxX, maxY) {
     this.body = startBody;
     this.direction = direction;
     this.lastStepDirection = direction;
+    this.maxX = maxX;
+    this.maxY = maxY;
   },
 
   /**
@@ -252,13 +260,13 @@ const snake = {
     // Возвращаем точку, где окажется голова змейки в зависимости от направления.
     switch (this.direction) {
       case 'up':
-        return {x: firstPoint.x, y: firstPoint.y - 1};
+        return {x: firstPoint.x, y: firstPoint.y !== 0 ? firstPoint.y - 1 : this.maxY};
       case 'right':
-        return {x: firstPoint.x + 1, y: firstPoint.y};
+        return {x: firstPoint.x !== this.maxX ? firstPoint.x + 1 : 0, y: firstPoint.y};
       case 'down':
-        return {x: firstPoint.x, y: firstPoint.y + 1};
+        return {x: firstPoint.x, y: firstPoint.y !== this.maxY ? firstPoint.y + 1 : 0};
       case 'left':
-        return {x: firstPoint.x - 1, y: firstPoint.y};
+        return {x: firstPoint.x !== 0 ? firstPoint.x - 1 : this.maxX, y: firstPoint.y};
     }
   },
 
@@ -355,47 +363,46 @@ const status = {
   },
 };
 
-/** 
- * Объект счетчика. Подсчитывает очки пользователя. 
- * @property {int} count Очки пользователя. 
- * @property {HTMLElement} countEl DOM-элемент для вставки числа отображающего 
- * количество очков пользователя. 
+/**
+ * Объект счетчика. Подсчитывает очки пользователя.
+ * @property {int} count Очки пользователя.
+ * @property {HTMLElement} countEl DOM-элемент для вставки числа отображающего количество очков пользователя.
  */
 const score = {
   count: null,
   countEl: null,
 
-  /**   
-   * Инициализацирует счетчик.   
+  /**
+   * Инициализацирует счетчик.
    */
   init() {
-    this.countEl = document.getElementById('count');
+    this.countEl = document.getElementById('score-count');
     this.drop();
   },
 
-  /**   
-   * Инкриминирует счетчик.   
+  /**
+   * Инкрементирует счетчик.
    */
   increment() {
     this.count++;
     this.render();
   },
 
-  /**   
-   * Сбрасывает счетчик.   
+  /**
+   * Сбрасывает счетчик.
    */
   drop() {
     this.count = 0;
     this.render();
   },
 
-  /**   
-   * Отображает количество очков пользователю.   
+  /**
+   * Отображает количество очков пользователю.
    */
   render() {
-    this.countEl.innerText = `Счёт: ${this.count}`;
-  },
-}
+    this.countEl.textContent = this.count;
+  }
+};
 
 /**
  * Объект игры.
@@ -404,8 +411,8 @@ const score = {
  * @property {snake} snake Объект змейки.
  * @property {food} food Объект еды.
  * @property {status} status Статус игры.
+ * @property {score} score Счетчик игры.
  * @property {int} tickInterval Номер интервала игры.
- * @property {score} score Объект счёта
  */
 const game = {
   config,
@@ -413,8 +420,8 @@ const game = {
   snake,
   food,
   status,
-  tickInterval: null,
   score,
+  tickInterval: null,
 
   /**
    * Инициализация игры.
@@ -432,10 +439,10 @@ const game = {
       }
       return;
     }
-    // Инициализируем счётчик.
-    this.score.init();
     // Инициализируем карту.
     this.map.init(this.config.getRowsCount(), this.config.getColsCount());
+    // Инициализируем счетчик.
+    this.score.init();
     // Устанавливаем обработчики событий.
     this.setEventHandlers();
     // Ставим игру в начальное положение.
@@ -448,12 +455,12 @@ const game = {
   reset() {
     // Ставим статус игры в "остановлена".
     this.stop();
+    // Сбрасываем счетчик.
+    this.score.drop();
     // Инициализируем змейку.
-    this.snake.init(this.getStartSnakeBody(), 'up');
+    this.snake.init(this.getStartSnakeBody(), 'up', this.config.getColsCount() - 1, this.config.getRowsCount() - 1);
     // Ставим еду на карту в случайную пустую ячейку.
     this.food.setCoordinates(this.getRandomFreeCoordinates());
-    // Сбрасываем счётчик в ноль.
-    this.score.drop();
     // Отображаем все что нужно для игры.
     this.render();
   },
@@ -504,10 +511,10 @@ const game = {
     }
     // Если следующий шаг будет на еду, то заходим в if.
     if (this.food.isOnPoint(this.snake.getNextStepHeadPoint())) {
-      // Увеличиваем счёт на единицу. 
-      this.score.increment();
       // Прибавляем к змейке ячейку.
       this.snake.growUp();
+      // Инкрементируем счетчик.
+      this.score.increment();
       // Ставим еду в свободную ячейку.
       this.food.setCoordinates(this.getRandomFreeCoordinates());
       // Если выиграли, завершаем игру.
@@ -675,14 +682,8 @@ const game = {
    * @returns {boolean} true если следующий шаг змейки возможен, false если шаг не может быть совершен.
    */
   canMakeStep() {
-    // Получаем следующую точку головы змейки в соответствии с текущим направлением.
-    const nextHeadPoint = this.snake.getNextStepHeadPoint();
-    // Змейка может сделать шаг если следующая точка не на теле змейки и точка внутри игрового поля.
-    return !this.snake.isOnPoint(nextHeadPoint) &&
-      nextHeadPoint.x < this.config.getColsCount() &&
-      nextHeadPoint.y < this.config.getRowsCount() &&
-      nextHeadPoint.x >= 0 &&
-      nextHeadPoint.y >= 0;
+    // Змейка может сделать шаг если следующая точка не на теле змейки.
+    return !this.snake.isOnPoint(this.snake.getNextStepHeadPoint());
   },
 };
 
